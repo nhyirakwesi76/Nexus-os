@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NexusOS</title>
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NexusOS">
+<meta name="application-name" content="NexusOS">
+<meta name="theme-color" content="#020609">
+<meta name="description" content="NexusOS — Futuristic simulated desktop OS">
+<meta name="msapplication-TileColor" content="#020609">
+<meta name="msapplication-tap-highlight" content="no">
+
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22NexusOS%22%2C%22short_name%22%3A%22NexusOS%22%2C%22description%22%3A%22Futuristic+simulated+desktop+OS%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22fullscreen%22%2C%22orientation%22%3A%22landscape%22%2C%22background_color%22%3A%22%23020609%22%2C%22theme_color%22%3A%22%2300d4ff%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg+xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'+viewBox%3D'0+0+512+512'%253E%253Crect+width%3D'512'+height%3D'512'+fill%3D'%23020609'%2F%253E%253Ctext+x%3D'50%25'+y%3D'54%25'+font-size%3D'200'+text-anchor%3D'middle'+dominant-baseline%3D'middle'+fill%3D'%2300d4ff'%253E%E2%AC%A1%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any+maskable%22%7D%5D%7D">
+
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%23020609'/><text x='50%25' y='54%25' font-size='260' text-anchor='middle' dominant-baseline='middle' fill='%2300d4ff'>⬡</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%23020609'/><text x='50%25' y='54%25' font-size='260' text-anchor='middle' dominant-baseline='middle' fill='%2300d4ff'>⬡</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #04080f;
+  --desk: #060d18;
+  --panel: #080f1c;
+  --surface: #0b1525;
+  --elevated: #0f1d30;
+  --border: rgba(0,212,255,.1);
+  --border2: rgba(0,212,255,.25);
+  --border3: rgba(0,212,255,.5);
+  --cyan: #00d4ff;
+  --cyan2: #00b8e6;
+  --green: #00ff88;
+  --orange: #ff8c00;
+  --red: #ff3355;
+  --yellow: #ffd600;
+  --purple: #9c6fff;
+  --glow: rgba(0,212,255,.12);
+  --glow2: rgba(0,212,255,.25);
+  --text: #d0eeff;
+  --text2: #6a9ab8;
+  --text3: #2a4a6a;
+  --win-bar: 38px;
+  --taskbar: 52px;
+}
+*{margin:0;padding:0;box-sizing:border-box;user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'Exo 2',sans-serif;color:var(--text);cursor:default}
+
+/* ── BOOT SCREEN ── */
+#boot{
+  position:fixed;inset:0;background:#000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:9999;gap:24px;
+}
+.boot-logo{
+  font-family:'Orbitron',monospace;font-size:42px;font-weight:900;
+  letter-spacing:12px;color:var(--cyan);
+  text-shadow:0 0 40px rgba(0,212,255,.7),0 0 80px rgba(0,212,255,.3);
+  animation:bootGlow 1s ease-in-out infinite alternate;
+}
+@keyframes bootGlow{from{text-shadow:0 0 30px rgba(0,212,255,.5)}to{text-shadow:0 0 60px rgba(0,212,255,.9),0 0 100px rgba(0,212,255,.4)}}
+.boot-sub{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--text2)}
+.boot-bar-wrap{width:280px;height:2px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+.boot-bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan2),var(--cyan));
+  border-radius:2px;transition:width .05s linear;box-shadow:0 0 8px var(--cyan)}
+.boot-log{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);
+  letter-spacing:1px;height:14px;text-align:center}
+
+/* ── DESKTOP ── */
+#desktop{
+  width:100%;height:calc(100% - var(--taskbar));
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(0,40,80,.35) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(0,60,100,.2) 0%, transparent 60%),
+    linear-gradient(160deg,#060d18 0%,#04080f 100%);
+}
+#desktop::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,212,255,.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,.02) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;
+}
+#desktop::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 40% 40% at 50% 50%,rgba(0,212,255,.03),transparent);
+  pointer-events:none;animation:breathe 6s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* scan line */
+.scanline{
+  position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,.08),transparent);
+  animation:scanmove 12s linear infinite;pointer-events:none;z-index:1;
+}
+@keyframes scanmove{0%{top:-2px}100%{top:100%}}
+
+/* ── DESKTOP ICONS ── */
+.desk-icons{
+  position:absolute;top:20px;left:20px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.dicon{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:10px 8px;border-radius:8px;cursor:pointer;
+  transition:all .15s;width:72px;
+}
+.dicon:hover{background:rgba(0,212,255,.06)}
+.dicon:active{transform:scale(.92)}
+.dicon-img{
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;border:1px solid var(--border);
+  background:var(--elevated);
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+  transition:all .15s;
+}
+.dicon:hover .dicon-img{
+  border-color:var(--border2);
+  box-shadow:0 4px 20px rgba(0,212,255,.15),0 0 0 1px rgba(0,212,255,.1);
+  transform:translateY(-2px);
+}
+.dicon-label{font-size:10px;color:var(--text);text-align:center;
+  font-weight:500;letter-spacing:.3px;
+  text-shadow:0 1px 4px rgba(0,0,0,.8);}
+
+/* ── CLOCK WIDGET ── */
+#clock-widget{
+  position:absolute;right:24px;top:24px;
+  text-align:right;pointer-events:none;
+}
+#clock-time{
+  font-family:'Orbitron',monospace;font-size:32px;font-weight:700;
+  color:var(--cyan);letter-spacing:2px;
+  text-shadow:0 0 20px rgba(0,212,255,.4);
+  line-height:1;
+}
+#clock-date{
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  color:var(--text2);letter-spacing:2px;margin-top:4px;
+}
+
+/* ── TASKBAR ── */
+#taskbar{
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--taskbar);
+  background:rgba(4,8,15,.92);
+  border-top:1px solid var(--border);
+  backdrop-filter:blur(20px);
+  display:flex;align-items:center;padding:0 12px;gap:6px;
+  z-index:1000;
+}
+#taskbar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:.3;
+}
+.tb-logo{
+  font-family:'Orbitron',monospace;font-size:13px;font-weight:900;
+  letter-spacing:3px;color:var(--cyan);padding:0 14px 0 6px;
+  text-shadow:0 0 12px rgba(0,212,255,.4);flex-shrink:0;
+  border-right:1px solid var(--border);margin-right:4px;
+}
+.tb-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 12px;border-radius:6px;
+  border:1px solid transparent;background:transparent;
+  color:var(--text2);cursor:pointer;font-family:'Exo 2',sans-serif;
+  font-size:12px;font-weight:500;letter-spacing:.5px;
+  transition:all .15s;white-space:nowrap;flex-shrink:0;
+}
+.tb-btn:hover{background:var(--glow);border-color:var(--border);color:var(--text)}
+.tb-btn.active{
+  background:rgba(0,212,255,.08);border-color:var(--border2);
+  color:var(--cyan);
+}
+.tb-btn.minimized{opacity:.6}
+.tb-sep{width:1px;height:28px;background:var(--border);flex-shrink:0;margin:0 4px}
+.tb-icon{font-size:16px;line-height:1}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tb-time{
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  color:var(--text2);letter-spacing:1px;
+}
+.tb-sys{display:flex;align-items:center;gap:10px;padding:4px 10px;
+  border-left:1px solid var(--border)}
+.sys-item{
+  display:flex;align-items:center;gap:4px;
+  font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);
+  letter-spacing:.5px;cursor:pointer;transition:color .2s;
+}
+.sys-item:hover{color:var(--cyan)}
+
+/* ── WINDOWS ── */
+.window{
+  position:absolute;min-width:300px;min-height:200px;
+  border-radius:10px;overflow:hidden;
+  border:1px solid var(--border2);
+  box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(0,212,255,.05),
+    inset 0 1px 0 rgba(255,255,255,.04);
+  display:flex;flex-direction:column;
+  background:var(--panel);
+  transition:box-shadow .2s;
+  will-change:transform;
+}
+.window.focused{
+  border-color:var(--border3);
+  box-shadow:0 24px 70px rgba(0,0,0,.8),0 0 30px rgba(0,212,255,.08),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  z-index:500!important;
+}
+.window.minimized{display:none}
+.win-bar{
+  height:var(--win-bar);flex-shrink:0;
+  display:flex;align-items:center;padding:0 10px;gap:8px;
+  background:linear-gradient(180deg,rgba(0,212,255,.06),rgba(0,212,255,.02));
+  border-bottom:1px solid var(--border);
+  cursor:move;
+}
+.win-btns{display:flex;gap:6px;flex-shrink:0}
+.wbtn{
+  width:13px;height:13px;border-radius:50%;border:none;
+  cursor:pointer;transition:all .15s;flex-shrink:0;
+}
+.wbtn.close{background:#ff3355}
+.wbtn.min{background:#ffd600}
+.wbtn.max{background:#00ff88}
+.wbtn:hover{filter:brightness(1.3);transform:scale(1.15)}
+.win-title{
+  flex:1;text-align:center;
+  font-family:'Orbitron',monospace;font-size:10px;font-weight:600;
+  letter-spacing:2px;color:var(--text2);
+}
+.win-icon-sm{font-size:14px;flex-shrink:0}
+.win-body{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.win-resize{
+  position:absolute;right:0;bottom:0;width:16px;height:16px;
+  cursor:se-resize;z-index:10;
+  background:linear-gradient(135deg,transparent 50%,rgba(0,212,255,.2) 50%);
+}
+
+/* ── APP: TERMINAL ── */
+#app-terminal .win-body{background:#000;padding:12px;overflow-y:auto;flex-direction:column}
+.term-output{
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+  line-height:1.8;flex:1;overflow-y:auto;
+}
+.term-output::-webkit-scrollbar{width:3px}
+.term-output::-webkit-scrollbar-thumb{background:var(--border2)}
+.term-line{display:block}
+.term-line.cmd{color:#00ff88}
+.term-line.out{color:var(--text2)}
+.term-line.err{color:var(--red)}
+.term-line.sys{color:var(--cyan);opacity:.7}
+.term-input-row{
+  display:flex;align-items:center;gap:6px;margin-top:8px;
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+}
+.term-prompt{color:var(--green);flex-shrink:0}
+#term-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--green);font-family:'Share Tech Mono',monospace;font-size:12px;
+  caret-color:var(--green);
+}
+
+/* ── APP: FILE MANAGER ── */
+#app-files .win-body{background:var(--panel)}
+.fm-toolbar{
+  display:flex;align-items:center;gap:6px;padding:8px 12px;
+  border-bottom:1px solid var(--border);background:var(--surface);
+  flex-shrink:0;
+}
+.fm-nav-btn{
+  padding:4px 10px;border-radius:4px;border:1px solid var(--border);
+  background:var(--elevated);color:var(--text2);cursor:pointer;
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  transition:all .15s;
+}
+.fm-nav-btn:hover{border-color:var(--border2);color:var(--cyan)}
+.fm-path{
+  flex:1;padding:4px 10px;border-radius:4px;
+  background:var(--elevated);border:1px solid var(--border);
+  font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);
+  letter-spacing:.5px;
+}
+.fm-content{display:flex;flex:1;overflow:hidden}
+.fm-sidebar{
+  width:130px;flex-shrink:0;border-right:1px solid var(--border);
+  background:var(--surface);padding:8px 0;overflow-y:auto;
+}
+.fm-side-item{
+  display:flex;align-items:center;gap:8px;padding:7px 12px;
+  font-size:12px;cursor:pointer;transition:all .15s;color:var(--text2);
+}
+.fm-side-item:hover{background:var(--glow);color:var(--text)}
+.fm-side-item.active{background:rgba(0,212,255,.08);color:var(--cyan);
+  border-right:2px solid var(--cyan)}
+.fm-grid{
+  flex:1;padding:12px;display:flex;flex-wrap:wrap;
+  gap:8px;align-content:flex-start;overflow-y:auto;
+}
+.fm-grid::-webkit-scrollbar{width:3px}
+.fm-grid::-webkit-scrollbar-thumb{background:var(--border)}
+.fm-item{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:10px 8px;border-radius:6px;cursor:pointer;
+  width:80px;transition:all .15s;text-align:center;
+}
+.fm-item:hover{background:var(--glow)}
+.fm-item.selected{background:rgba(0,212,255,.1);border:1px solid var(--border2)}
+.fm-item-icon{font-size:28px;line-height:1}
+.fm-item-name{font-size:10px;color:var(--text);word-break:break-word;line-height:1.3}
+.fm-status{
+  padding:4px 12px;border-top:1px solid var(--border);
+  font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);
+  background:var(--surface);letter-spacing:1px;flex-shrink:0;
+}
+
+/* ── APP: TEXT EDITOR ── */
+#app-editor .win-body{background:var(--panel);display:flex;flex-direction:column}
+.ed-toolbar{
+  display:flex;align-items:center;gap:4px;padding:6px 10px;
+  border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;
+}
+.ed-btn{
+  padding:4px 10px;border-radius:4px;border:1px solid var(--border);
+  background:var(--elevated);color:var(--text2);cursor:pointer;
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  transition:all .15s;
+}
+.ed-btn:hover{border-color:var(--border2);color:var(--cyan)}
+.ed-filename{
+  flex:1;padding:3px 8px;border-radius:4px;
+  background:var(--elevated);border:1px solid var(--border);
+  font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);
+  outline:none;
+}
+.ed-area{
+  flex:1;padding:14px 16px;
+  background:transparent;border:none;outline:none;
+  color:var(--text);font-family:'Share Tech Mono',monospace;
+  font-size:13px;line-height:1.7;resize:none;
+  caret-color:var(--cyan);
+}
+.ed-area::selection{background:rgba(0,212,255,.2)}
+.ed-statusbar{
+  padding:3px 12px;border-top:1px solid var(--border);
+  background:var(--surface);display:flex;gap:16px;
+  font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);
+  letter-spacing:1px;flex-shrink:0;
+}
+
+/* ── APP: CALCULATOR ── */
+#app-calc .win-body{background:var(--panel);padding:14px;display:flex;flex-direction:column;gap:10px}
+.calc-display{
+  background:var(--elevated);border:1px solid var(--border);border-radius:6px;
+  padding:12px 16px;text-align:right;
+}
+.calc-expr{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);min-height:14px}
+.calc-val{
+  font-family:'Orbitron',monospace;font-size:26px;font-weight:700;
+  color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.4);
+  word-break:break-all;
+}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cbtn{
+  padding:0;height:48px;border-radius:6px;border:1px solid var(--border);
+  background:var(--elevated);color:var(--text);cursor:pointer;
+  font-family:'Orbitron',monospace;font-size:13px;font-weight:600;
+  transition:all .12s;
+}
+.cbtn:hover{background:var(--glow);border-color:var(--border2);color:var(--cyan);
+  box-shadow:0 0 10px rgba(0,212,255,.1)}
+.cbtn:active{transform:scale(.93)}
+.cbtn.op{color:var(--cyan);background:rgba(0,212,255,.06)}
+.cbtn.eq{
+  background:linear-gradient(135deg,rgba(0,212,255,.2),rgba(0,212,255,.1));
+  color:var(--cyan);border-color:var(--border2);
+  box-shadow:0 0 15px rgba(0,212,255,.1);
+}
+.cbtn.eq:hover{box-shadow:0 0 20px rgba(0,212,255,.2)}
+.cbtn.special{color:var(--orange)}
+.cbtn.span2{grid-column:span 2}
+
+/* ── APP: SETTINGS ── */
+#app-settings .win-body{background:var(--panel);display:flex}
+.set-sidebar{
+  width:140px;flex-shrink:0;border-right:1px solid var(--border);
+  padding:8px 0;background:var(--surface);
+}
+.set-item{
+  display:flex;align-items:center;gap:8px;padding:9px 14px;
+  font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;
+}
+.set-item:hover{background:var(--glow);color:var(--text)}
+.set-item.active{color:var(--cyan);background:rgba(0,212,255,.08);
+  border-left:2px solid var(--cyan)}
+.set-content{flex:1;padding:18px;overflow-y:auto}
+.set-section{margin-bottom:22px}
+.set-section h3{
+  font-family:'Orbitron',monospace;font-size:10px;font-weight:600;
+  letter-spacing:3px;color:var(--cyan);margin-bottom:14px;
+  padding-bottom:8px;border-bottom:1px solid var(--border);
+}
+.set-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03);
+}
+.set-row-label{font-size:13px;color:var(--text2)}
+.set-row-desc{font-size:10px;color:var(--text3);margin-top:2px;
+  font-family:'Share Tech Mono',monospace;letter-spacing:.5px}
+.toggle{
+  width:40px;height:22px;border-radius:11px;
+  background:var(--elevated);border:1px solid var(--border);
+  cursor:pointer;position:relative;transition:all .2s;flex-shrink:0;
+}
+.toggle.on{background:rgba(0,212,255,.2);border-color:var(--border2)}
+.toggle::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--text3);transition:all .2s;
+}
+.toggle.on::after{left:21px;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
+.color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.color-chip{
+  width:28px;height:28px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:all .15s;
+}
+.color-chip:hover,.color-chip.active{border-color:#fff;transform:scale(1.15)}
+.set-slider{
+  -webkit-appearance:none;width:140px;height:4px;
+  border-radius:2px;background:var(--elevated);outline:none;cursor:pointer;
+}
+.set-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;
+  border-radius:50%;background:var(--cyan);cursor:pointer;
+  box-shadow:0 0 6px var(--cyan);
+}
+
+/* ── APP: BROWSER ── */
+#app-browser .win-body{background:var(--panel);display:flex;flex-direction:column}
+.br-bar{
+  display:flex;align-items:center;gap:6px;padding:7px 10px;
+  border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;
+}
+.br-nav{
+  display:flex;gap:3px;
+}
+.br-nav-btn{
+  width:26px;height:26px;border-radius:4px;border:1px solid var(--border);
+  background:var(--elevated);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  transition:all .15s;
+}
+.br-nav-btn:hover{border-color:var(--border2);color:var(--cyan)}
+.br-url{
+  flex:1;padding:5px 10px;border-radius:4px;
+  background:var(--elevated);border:1px solid var(--border);
+  font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);
+  outline:none;transition:border .2s;
+}
+.br-url:focus{border-color:var(--border2)}
+.br-go{
+  padding:5px 12px;border-radius:4px;border:1px solid var(--border2);
+  background:var(--glow);color:var(--cyan);cursor:pointer;
+  font-family:'Share Tech Mono',monospace;font-size:10px;transition:all .15s;
+}
+.br-go:hover{background:var(--glow2)}
+.br-content{
+  flex:1;overflow-y:auto;padding:20px;
+  background:var(--bg);
+}
+.br-content::-webkit-scrollbar{width:3px}
+.br-content::-webkit-scrollbar-thumb{background:var(--border)}
+.br-home{display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px 20px}
+.br-home-logo{
+  font-family:'Orbitron',monospace;font-size:28px;font-weight:900;
+  letter-spacing:8px;color:var(--cyan);text-shadow:0 0 20px rgba(0,212,255,.4);
+}
+.br-search-wrap{width:100%;max-width:420px;display:flex;gap:6px}
+.br-search{
+  flex:1;padding:9px 14px;border-radius:6px;
+  background:var(--surface);border:1px solid var(--border2);
+  color:var(--text);font-family:'Exo 2',sans-serif;font-size:14px;outline:none;
+}
+.br-search:focus{border-color:var(--border3)}
+.br-search-btn{
+  padding:9px 16px;border-radius:6px;border:1px solid var(--border2);
+  background:var(--glow);color:var(--cyan);cursor:pointer;
+  font-family:'Share Tech Mono',monospace;font-size:11px;transition:all .15s;
+}
+.br-search-btn:hover{background:var(--glow2)}
+.br-bookmarks{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;max-width:500px}
+.br-bk{
+  padding:7px 14px;border-radius:20px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text2);cursor:pointer;
+  font-size:11px;font-family:'Share Tech Mono',monospace;transition:all .15s;
+}
+.br-bk:hover{border-color:var(--border2);color:var(--cyan);background:var(--glow)}
+.br-page{color:var(--text);line-height:1.7;font-size:14px}
+.br-page h1{font-family:'Orbitron',monospace;color:var(--cyan);font-size:18px;
+  letter-spacing:2px;margin-bottom:12px}
+.br-page h2{color:var(--text2);font-size:14px;margin:12px 0 6px}
+.br-page p{color:var(--text2);margin-bottom:10px}
+.br-page code{
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+  background:var(--surface);padding:1px 6px;border-radius:3px;color:#c792ea;
+}
+
+/* ── APP: MUSIC ── */
+#app-music .win-body{
+  background:radial-gradient(circle at 50% 0%,rgba(0,212,255,.05),var(--panel));
+  padding:20px;display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.music-art{
+  width:110px;height:110px;border-radius:12px;
+  background:linear-gradient(135deg,var(--elevated),var(--surface));
+  border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:44px;
+  box-shadow:0 8px 30px rgba(0,0,0,.5),0 0 0 1px rgba(0,212,255,.05);
+  position:relative;overflow:hidden;
+}
+.music-art::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50%,transparent 30%,rgba(0,0,0,.4));
+}
+.music-info{text-align:center}
+.music-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:600;
+  color:var(--text);letter-spacing:1px}
+.music-artist{font-size:11px;color:var(--text2);margin-top:3px;
+  font-family:'Share Tech Mono',monospace}
+.music-progress{width:100%;display:flex;flex-direction:column;gap:4px}
+.progress-bar{
+  width:100%;height:3px;background:var(--elevated);border-radius:2px;cursor:pointer;
+  position:relative;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--cyan2),var(--cyan));
+  border-radius:2px;width:35%;transition:width .5s linear;
+  box-shadow:0 0 6px var(--cyan);
+}
+.progress-times{
+  display:flex;justify-content:space-between;
+  font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);
+}
+.music-controls{display:flex;align-items:center;gap:12px}
+.mc-btn{
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--border);
+  background:var(--elevated);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;transition:all .15s;
+}
+.mc-btn:hover{border-color:var(--border2);color:var(--cyan);background:var(--glow)}
+.mc-btn.play{
+  width:46px;height:46px;font-size:16px;
+  border-color:var(--border2);background:rgba(0,212,255,.1);color:var(--cyan);
+  box-shadow:0 0 16px rgba(0,212,255,.15);
+}
+.mc-btn.play:hover{box-shadow:0 0 24px rgba(0,212,255,.25)}
+.music-playlist{width:100%;border-top:1px solid var(--border);padding-top:10px}
+.pl-item{
+  display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;
+  cursor:pointer;transition:all .15s;
+}
+.pl-item:hover{background:var(--glow)}
+.pl-item.active{color:var(--cyan)}
+.pl-num{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);width:16px}
+.pl-name{font-size:12px;flex:1}
+.pl-dur{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)}
+
+/* context menu */
+#ctx-menu{
+  position:fixed;background:var(--elevated);border:1px solid var(--border2);
+  border-radius:6px;padding:4px 0;min-width:160px;z-index:2000;
+  box-shadow:0 8px 24px rgba(0,0,0,.6);display:none;
+}
+.ctx-item{
+  padding:7px 16px;font-size:12px;cursor:pointer;
+  color:var(--text2);transition:all .12s;
+  display:flex;align-items:center;gap:8px;
+}
+.ctx-item:hover{background:var(--glow);color:var(--cyan)}
+.ctx-sep{height:1px;background:var(--border);margin:3px 0}
+.ctx-icon{font-size:14px;width:16px}
+
+/* notifications */
+.notif{
+  position:fixed;right:16px;bottom:70px;
+  padding:10px 16px;border-radius:6px;z-index:3000;
+  border:1px solid var(--border2);background:var(--elevated);
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  color:var(--cyan);letter-spacing:.5px;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  animation:nIn .3s ease,nOut .3s ease 2.7s forwards;
+}
+@keyframes nIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes nOut{to{opacity:0;transform:translateX(20px)}}
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <div class="boot-logo">NEXUS OS</div>
+  <div class="boot-sub">VERSION 1.0.0 · INITIALIZING</div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="boot-bar"></div></div>
+  <div class="boot-log" id="boot-log">Loading kernel...</div>
+</div>
+
+<div id="desktop" style="display:none" oncontextmenu="showCtx(event)">
+  <div class="scanline"></div>
+  <div id="clock-widget">
+    <div id="clock-time">00:00:00</div>
+    <div id="clock-date">MON 01 JAN 2025</div>
+  </div>
+  <div class="desk-icons">
+    <div class="dicon" ondblclick="openApp('terminal')">
+      <div class="dicon-img">🖥️</div>
+      <div class="dicon-label">Terminal</div>
+    </div>
+    <div class="dicon" ondblclick="openApp('files')">
+      <div class="dicon-img">📁</div>
+      <div class="dicon-label">Files</div>
+    </div>
+    <div class="dicon" ondblclick="openApp('editor')">
+      <div class="dicon-img">📝</div>
+      <div class="dicon-label">Editor</div>
+    </div>
+    <div class="dicon" ondblclick="openApp('browser')">
+      <div class="dicon-img">🌐</div>
+      <div class="dicon-label">Browser</div>
+    </div>
+    <div class="dicon" ondblclick="openApp('calc')">
+      <div class="dicon-img">🔢</div>
+      <div class="dicon-label">Calc</div>
+    </div>
+    <div class="dicon" ondblclick="openApp('music')">
+      <div class="dicon-img">🎵</div>
+      <div class="dicon-label">Music</div>
+    </div>
+    <div class="dicon" ondblclick="openApp('settings')">
+      <div class="dicon-img">⚙️</div>
+      <div class="dicon-label">Settings</div>
+    </div>
+  </div>
+</div>
+
+<div id="taskbar" style="display:none">
+  <div class="tb-logo">NX</div>
+  <div id="tb-apps"></div>
+  <div class="tb-right">
+    <button onclick="showInstallGuide()" style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.08);color:#00d4ff;cursor:pointer;font-family:monospace;font-size:10px;letter-spacing:1px">📲 INSTALL</button>
+    <div class="tb-sys">
+      <div class="sys-item" title="CPU">💻 <span id="cpu-val">12%</span></div>
+      <div class="sys-item" title="RAM">🧠 <span id="ram-val">2.1GB</span></div>
+      <div class="sys-item" title="Network">📡 ONLINE</div>
+    </div>
+    <div class="tb-time" id="tb-time">00:00</div>
+  </div>
+</div>
+
+<div class="window" id="app-terminal" style="display:none;width:580px;height:380px;left:80px;top:60px">
+  <div class="win-bar" onmousedown="startDrag(event,'app-terminal')">
+    <div class="win-btns">
+      <button class="wbtn close" onclick="closeApp('terminal')"></button>
+      <button class="wbtn min" onclick="minimizeApp('terminal')"></button>
+      <button class="wbtn max" onclick="maximizeApp('terminal')"></button>
+    </div>
+    <div class="win-icon-sm">🖥️</div>
+    <div class="win-title">TERMINAL</div>
+    <div style="width:52px"></div>
+  </div>
+  <div class="win-body" style="padding:12px;background:#000">
+    <div class="term-output" id="term-out"></div>
+    <div class="term-input-row">
+      <span class="term-prompt">nexus@os:~$</span>
+      <input id="term-input" type="text" autocomplete="off" spellcheck="false" onkeydown="termKey(event)" />
+    </div>
+  </div>
+  <div class="win-resize" onmousedown="startResize(event,'app-terminal')"></div>
+</div>
+
+<div class="window" id="app-files" style="display:none;width:580px;height:400px;left:140px;top:80px">
+  <div class="win-bar" onmousedown="startDrag(event,'app-files')">
+    <div class="win-btns">
+      <button class="wbtn close" onclick="closeApp('files')"></button>
+      <button class="wbtn min" onclick="minimizeApp('files')"></button>
+      <button class="wbtn max" onclick="maximizeApp('files')"></button>
+    </div>
+    <div class="win-icon-sm">📁</div>
+    <div class="win-title">FILE MANAGER</div>
+    <div style="width:52px"></div>
+  </div>
+  <div class="win-body">
+    <div class="fm-toolbar">
+      <button class="fm-nav-btn" onclick="fmBack()">← Back</button>
+      <button class="fm-nav-btn" onclick="fmUp()">↑ Up</button>
+      <div class="fm-path" id="fm-path">/home/user</div>
+    </div>
+    <div class="fm-content">
+      <div class="fm-sidebar">
+        <div class="fm-side-item active" onclick="fmNav('/home')">🏠 Home</div>
+        <div class="fm-side-item" onclick="fmNav('/documents')">📄 Documents</div>
+        <div class="fm-side-item" onclick="fmNav('/downloads')">⬇️ Downloads</div>
+        <div class="fm-side-item" onclick="fmNav('/music')">🎵 Music</div>
+        <div class="fm-side-item" onclick="fmNav('/pictures')">🖼️ Pictures</div>
+        <div class="fm-side-item" onclick="fmNav('/system')">⚙️ System</div>
+        <div class="fm-side-item" onclick="fmNav('/trash')">🗑️ Trash</div>
+      </div>
+      <div class="fm-grid" id="fm-grid"></div>
+    </div>
+    <div class="fm-status" id="fm-status">12 items · 4.2 GB free</div>
+  </div>
+  <div class="win-resize" onmousedown="startResize(event,'app-files')"></div>
+</div>
+
+<div class="window" id="app-editor" style="display:none;width:560px;height:420px;left:200px;top:60px">
+  <div class="win-bar" onmousedown="startDrag(event,'app-editor')">
+    <div class="win-btns">
+      <button class="wbtn close" onclick="closeApp('editor')"></button>
+      <button class="wbtn min" onclick="minimizeApp('editor')"></button>
+      <button class="wbtn max" onclick="maximizeApp('editor')"></button>
+    </div>
+    <div class="win-icon-sm">📝</div>
+    <div class="win-title">TEXT EDITOR</div>
+    <div style="width:52px"></div>
+  </div>
+  <div class="win-body">
+    <div class="ed-toolbar">
+      <button class="ed-btn" onclick="edNew()">NEW</button>
+      <button class="ed-btn" onclick="edSave()">SAVE</button>
+      <button class="ed-btn" onclick="edOpen()">OPEN</button>
+      <input class="ed-filename" id="ed-filename" value="untitled.txt" />
+      <span style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)" id="ed-saved">● UNSAVED</span>
+    </div>
+    <textarea class="ed-area" id="ed-area" spellcheck="false"
+      placeholder="Start typing..." onkeyup="edUpdate()" oninput="edUpdate()"></textarea>
+    <div class="ed-statusbar">
+      <span id="ed-lines">Lines: 1</span>
+      <span id="ed-chars">Chars: 0</span>
+      <span id="ed-words">Words: 0</span>
+      <span>UTF-8</span>
+    </div>
+  </div>
+  <div class="win-resize" onmousedown="startResize(event,'app-editor')"></div>
+</div>
+
+<div class="window" id="app-calc" style="display:none;width:260px;height:390px;left:300px;top:80px">
+  <div class="win-bar" onmousedown="startDrag(event,'app-calc')">
+    <div class="win-btns">
+      <button class="wbtn close" onclick="closeApp('calc')"></button>
+      <button class="wbtn min" onclick="minimizeApp('calc')"></button>
+      <button class="wbtn max" onclick="maximizeApp('calc')"></button>
+    </div>
+    <div class="win-icon-sm">🔢</div>
+    <div class="win-title">CALCULATOR</div>
+    <div style="width:52px"></div>
+  </div>
+  <div class="win-body">
+    <div class="calc-display">
+      <div class="calc-expr" id="calc-expr"></div>
+      <div class="calc-val" id="calc-val">0</div>
+    </div>
+    <div class="calc-grid">
+      <button class="cbtn special" onclick="calcFn('clear')">C</button>
+      <button class="cbtn special" onclick="calcFn('sign')">±</button>
+      <button class="cbtn special" onclick="calcFn('pct')">%</button>
+      <button class="cbtn op" onclick="calcOp('/')">÷</button>
+      <button class="cbtn" onclick="calcNum('7')">7</button>
+      <button class="cbtn" onclick="calcNum('8')">8</button>
+      <button class="cbtn" onclick="calcNum('9')">9</button>
+      <button class="cbtn op" onclick="calcOp('*')">×</button>
+      <button class="cbtn" onclick="calcNum('4')">4</button>
+      <button class="cbtn" onclick="calcNum('5')">5</button>
+      <button class="cbtn" onclick="calcNum('6')">6</button>
+      <button class="cbtn op" onclick="calcOp('-')">−</button>
+      <button class="cbtn" onclick="calcNum('1')">1</button>
+      <button class="cbtn" onclick="calcNum('2')">2</button>
+      <button class="cbtn" onclick="calcNum('3')">3</button>
+      <button class="cbtn op" onclick="calcOp('+')">+</button>
+      <button class="cbtn span2" onclick="calcNum('0')">0</button>
+      <button class="cbtn" onclick="calcNum('.')">.</button>
+      <button class="cbtn eq" onclick="calcEq()">=</button>
+    </div>
+  </div>
+</div>
+
+<div class="window" id="app-browser" style="display:none;width:640px;height:460px;left:100px;top:50px">
+  <div class="win-bar" onmousedown="startDrag(event,'app-browser')">
+    <div class="win-btns">
+      <button class="wbtn close" onclick="closeApp('browser')"></button>
+      <button class="wbtn min" onclick="minimizeApp('browser')"></button>
+      <button class="wbtn max" onclick="maximizeApp('browser')"></button>
+    </div>
+    <div class="win-icon-sm">🌐</div>
+    <div class="win-title">NEXUS BROWSER</div>
+    <div style="width:52px"></div>
+  </div>
+  <div class="win-body">
+    <div class="br-bar">
+      <div class="br-nav">
+        <button class="br-nav-btn" onclick="brBack()">←</button>
+        <button class="br-nav-btn" onclick="brFwd()">→</button>
+        <button class="br-nav-btn" onclick="brHome()">⌂</button>
+      </div>
+      <input class="br-url" id="br-url" value="nexus://home" onkeydown="if(event.key==='Enter')brGo()" />
+      <button class="br-go" onclick="brGo()">GO</button>
+    </div>
+    <div class="br-content" id="br-content"></div>
+  </div>
+  <div class="win-resize" onmousedown="startResize(event,'app-browser')"></div>
+</div>
+
+<div class="window" id="app-music" style="display:none;width:290px;height:460px;left:380px;top:70px">
+  <div class="win-bar" onmousedown="startDrag(event,'app-music')">
+    <div class="win-btns">
+      <button class="wbtn close" onclick="closeApp('music')"></button>
+      <button class="wbtn min" onclick="minimizeApp('music')"></button>
+      <button class="wbtn max" onclick="maximizeApp('music')"></button>
+    </div>
+    <div class="win-icon-sm">🎵</div>
+    <div class="win-title">MUSIC</div>
+    <div style="width:52px"></div>
+  </div>
+  <div class="win-body">
+    <div class="music-art" id="music-art">🎵</div>
+    <div class="music-info">
+      <div class="music-title" id="music-title">Neon Drift</div>
+      <div class="music-artist" id="music-artist">SYNTHWAVE COLLECTIVE</div>
+    </div>
+    <div class="music-progress">
+      <div class="progress-bar"><div class="progress-fill" id="music-prog"></div></div>
+      <div class="progress-times"><span id="music-cur">1:23</span><span id="music-tot">3:45</span></div>
+    </div>
+    <div class="music-controls">
+      <button class="mc-btn" onclick="musicPrev()">⏮</button>
+      <button class="mc-btn" onclick="musicShuffle()" title="Shuffle">🔀</button>
+      <button class="mc-btn play" id="music-play-btn" onclick="musicToggle()">▶</button>
+      <button class="mc-btn" onclick="musicRepeat()" title="Repeat">🔁</button>
+      <button class="mc-btn" onclick="musicNext()">⏭</button>
+    </div>
+    <div class="music-playlist" id="music-playlist"></div>
+  </div>
+</div>
+
+<div class="window" id="app-settings" style="display:none;width:540px;height:400px;left:150px;top:90px">
+  <div class="win-bar" onmousedown="startDrag(event,'app-settings')">
+    <div class="win-btns">
+      <button class="wbtn close" onclick="closeApp('settings')"></button>
+      <button class="wbtn min" onclick="minimizeApp('settings')"></button>
+      <button class="wbtn max" onclick="maximizeApp('settings')"></button>
+    </div>
+    <div class="win-icon-sm">⚙️</div>
+    <div class="win-title">SYSTEM SETTINGS</div>
+    <div style="width:52px"></div>
+  </div>
+  <div class="win-body">
+    <div class="set-sidebar">
+      <div class="set-item active" onclick="setPanel('display', this)">🖥️ Display</div>
+      <div class="set-item" onclick="setPanel('system', this)">⚙️ System</div>
+      <div class="set-item" onclick="setPanel('about', this)">ℹ️ About</div>
+    </div>
+    <div class="set-content" id="set-content"></div>
+  </div>
+  <div class="win-resize" onmousedown="startResize(event,'app-settings')"></div>
+</div>
+
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="openApp('files')"><span class="ctx-icon">📁</span>Open Files</div>
+  <div class="ctx-item" onclick="openApp('terminal')"><span class="ctx-icon">🖥️</span>Open Terminal</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="openApp('editor')"><span class="ctx-icon">📝</span>New Text File</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="openApp('settings')"><span class="ctx-icon">⚙️</span>Settings</div>
+  <div class="ctx-item" onclick="notify('Display refreshed')"><span class="ctx-icon">🔄</span>Refresh</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// BOOT SEQUENCE
+// ═══════════════════════════════════════════════
+const bootLogs = [
+  'Loading kernel...','Initializing hardware...','Mounting filesystem...',
+  'Starting network services...','Loading UI components...','Applying user preferences...',
+  'Starting desktop environment...','Welcome to NexusOS!'
+];
+let bootIdx=0, bootPct=0;
+const bootInterval = setInterval(()=>{
+  bootPct += Math.random()*18+6;
+  if(bootPct>=100) bootPct=100;
+  document.getElementById('boot-bar').style.width = bootPct+'%';
+  if(bootIdx < bootLogs.length)
+    document.getElementById('boot-log').textContent = bootLogs[bootIdx++];
+  if(bootPct>=100){
+    clearInterval(bootInterval);
+    setTimeout(()=>{
+      document.getElementById('boot').style.opacity='0';
+      document.getElementById('boot').style.transition='opacity .6s';
+      setTimeout(()=>{
+        document.getElementById('boot').style.display='none';
+        document.getElementById('desktop').style.display='block';
+        document.getElementById('taskbar').style.display='flex';
+        startClock(); startSysStats();
+        notify('Welcome to NexusOS!');
+      },600);
+    },400);
+  }
+},220);
+
+// ═══════════════════════════════════════════════
+// CLOCK + STATS
+// ═══════════════════════════════════════════════
+function startClock(){
+  function tick(){
+    const now=new Date();
+    const days=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    document.getElementById('clock-time').textContent =
+      String(now.getHours()).padStart(2,'0')+':'+
+      String(now.getMinutes()).padStart(2,'0')+':'+
+      String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock-date').textContent =
+      days[now.getDay()]+' '+String(now.getDate()).padStart(2,'0')+' '+
+      months[now.getMonth()]+' '+now.getFullYear();
+    document.getElementById('tb-time').textContent =
+      String(now.getHours()).padStart(2,'0')+':'+
+      String(now.getMinutes()).padStart(2,'0');
+  }
+  tick(); setInterval(tick,1000);
+}
+function startSysStats(){
+  setInterval(()=>{
+    document.getElementById('cpu-val').textContent = (Math.random()*25+5).toFixed(0)+'%';
+    document.getElementById('ram-val').textContent = (Math.random()*1.5+1.8).toFixed(1)+'GB';
+  },2500);
+}
+
+// ═══════════════════════════════════════════════
+// WINDOW MANAGEMENT
+// ═══════════════════════════════════════════════
+let zCounter=100, dragging=null, resizing=null, dragOX=0, dragOY=0;
+const openApps={};
+
+function openApp(name){
+  const el=document.getElementById('app-'+name);
+  if(!el)return;
+  if(openApps[name]){
+    el.classList.remove('minimized');
+    focusWindow(name); return;
+  }
+  // stagger position
+  const count=Object.keys(openApps).length;
+  const offset=count*28;
+  const defaultPos={
+    terminal:{x:80,y:60},files:{x:140,y:80},editor:{x:200,y:60},
+    calc:{x:300,y:80},browser:{x:100,y:50},music:{x:380,y:70},settings:{x:150,y:90}
+  };
+  const pos=defaultPos[name]||{x:80,y:60};
+  el.style.left=(pos.x+offset)+'px';
+  el.style.top=(pos.y+offset)+'px';
+  el.style.display='flex';
+  el.classList.remove('minimized');
+  openApps[name]=true;
+  focusWindow(name);
+  updateTaskbar();
+  appInit(name);
+}
+
+function closeApp(name){
+  const el=document.getElementById('app-'+name);
+  if(el){ el.style.display='none'; el.classList.remove('focused'); }
+  delete openApps[name];
+  updateTaskbar();
+}
+
+function minimizeApp(name){
+  const el=document.getElementById('app-'+name);
+  if(el) el.classList.add('minimized');
+  document.querySelector(`#tb-apps .tb-btn[data-app="${name}"]`)?.classList.add('minimized');
+}
+
+function focusWindow(name){
+  document.querySelectorAll('.window').forEach(w=>w.classList.remove('focused'));
+  const el=document.getElementById('app-'+name);
+  if(el){ el.classList.add('focused'); el.style.zIndex=++zCounter; }
+  document.querySelectorAll('#tb-apps .tb-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`#tb-apps .tb-btn[data-app="${name}"]`)?.classList.add('active');
+}
+
+function maximizeApp(name){
+  const el=document.getElementById('app-'+name);
+  if(!el)return;
+  if(el.dataset.maxed==='1'){
+    el.style.left=el.dataset.ox; el.style.top=el.dataset.oy;
+    el.style.width=el.dataset.ow; el.style.height=el.dataset.oh;
+    el.dataset.maxed='0';
+  } else {
+    el.dataset.ox=el.style.left; el.dataset.oy=el.style.top;
+    el.dataset.ow=el.style.width; el.dataset.oh=el.style.height;
+    el.style.left='0'; el.style.top='0';
+    el.style.width='100vw'; el.style.height='calc(100vh - 52px)';
+    el.dataset.maxed='1';
+  }
+}
+
+function updateTaskbar(){
+  const tb=document.getElementById('tb-apps');
+  tb.innerHTML='';
+  const icons={terminal:'🖥️',files:'📁',editor:'📝',calc:'🔢',browser:'🌐',music:'🎵',settings:'⚙️'};
+  const labels={terminal:'Terminal',files:'Files',editor:'Editor',calc:'Calc',browser:'Browser',music:'Music',settings:'Settings'};
+  Object.keys(openApps).forEach(name=>{
+    const b=document.createElement('button');
+    b.className='tb-btn'; b.dataset.app=name;
+    b.innerHTML=`<span class="tb-icon">${icons[name]}</span>${labels[name]}`;
+    b.onclick=()=>{
+      const el=document.getElementById('app-'+name);
+      if(el.classList.contains('minimized')){el.classList.remove('minimized');focusWindow(name);}
+      else if(el.classList.contains('focused')) minimizeApp(name);
+      else focusWindow(name);
+    };
+    tb.appendChild(b);
+  });
+}
+
+// drag
+function startDrag(e,name){
+  if(e.target.classList.contains('wbtn'))return;
+  focusWindow(name);
+  const el=document.getElementById(name);
+  const rect=el.getBoundingClientRect();
+  dragOX=e.clientX-rect.left; dragOY=e.clientY-rect.top;
+  dragging=el;
+  e.preventDefault();
+}
+function startResize(e,name){
+  const el=document.getElementById(name);
+  focusWindow(name);
+  resizing={el,startX:e.clientX,startY:e.clientY,
+    startW:el.offsetWidth,startH:el.offsetHeight};
+  e.preventDefault(); e.stopPropagation();
+}
+document.addEventListener('mousemove',e=>{
+  if(dragging){
+    let nx=e.clientX-dragOX, ny=e.clientY-dragOY;
+    nx=Math.max(0,Math.min(nx,window.innerWidth-80));
+    ny=Math.max(0,Math.min(ny,window.innerHeight-52-30));
+    dragging.style.left=nx+'px'; dragging.style.top=ny+'px';
+  }
+  if(resizing){
+    const nw=Math.max(280,resizing.startW+(e.clientX-resizing.startX));
+    const nh=Math.max(180,resizing.startH+(e.clientY-resizing.startY));
+    resizing.el.style.width=nw+'px'; resizing.el.style.height=nh+'px';
+  }
+});
+document.addEventListener('mouseup',()=>{ dragging=null; resizing=null; });
+
+// click to focus
+document.querySelectorAll('.window').forEach(w=>{
+  w.addEventListener('mousedown',()=>{
+    const name=w.id.replace('app-','');
+    focusWindow(name);
+  });
+});
+
+// ═══════════════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════════════
+function appInit(name){
+  if(name==='terminal') termInit();
+  if(name==='files') fmInit('/home');
+  if(name==='browser') brHome();
+  if(name==='settings') setPanel('display');
+  if(name==='music') musicInit();
+}
+
+// ═══════════════════════════════════════════════
+// TERMINAL
+// ═══════════════════════════════════════════════
+const fs = {
+  '/':['home','system','var'],
+  '/home':['user','documents','downloads'],
+  '/home/user':['readme.txt','config.json'],
+  '/home/documents':['notes.txt','project.md'],
+  '/home/downloads':['archive.zip','image.png'],
+  '/system':['bin','etc','lib'],
+};
+let termCwd='/home/user', termHistory=[], termHistIdx=-1;
+
+function termInit(){
+  const out=document.getElementById('term-out');
+  out.innerHTML='';
+  termPrint('sys','NexusOS Terminal v1.0.0');
+  termPrint('sys','Type "help" for available commands.');
+  termPrint('sys','─'.repeat(42));
+  document.getElementById('term-input').focus();
+}
+
+function termPrint(type,text){
+  const out=document.getElementById('term-out');
+  const line=document.createElement('span');
+  line.className='term-line '+type;
+  line.textContent=text;
+  out.appendChild(line);
+  out.appendChild(document.createElement('br'));
+  out.scrollTop=out.scrollHeight;
+}
+
+function termKey(e){
+  const inp=document.getElementById('term-input');
+  if(e.key==='Enter'){
+    const cmd=inp.value.trim();
+    if(cmd){ termHistory.unshift(cmd); termHistIdx=-1; }
+    termPrint('cmd','nexus@os:'+termCwd+'$ '+cmd);
+    inp.value='';
+    termRun(cmd);
+  }
+  else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    if(termHistIdx<termHistory.length-1){ termHistIdx++; inp.value=termHistory[termHistIdx]; }
+  }
+  else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    if(termHistIdx>0){ termHistIdx--; inp.value=termHistory[termHistIdx]; }
+    else{ termHistIdx=-1; inp.value=''; }
+  }
+}
+
+function termRun(raw){
+  const args=raw.trim().split(/\s+/);
+  const cmd=args[0];
+  const a=args.slice(1);
+  switch(cmd){
+    case '': break;
+    case 'help':
+      termPrint('sys','Available commands:');
+      ['ls','cd [dir]','pwd','echo [text]','cat [file]','mkdir [name]','touch [name]',
+       'rm [name]','clear','date','whoami','uname','ps','top','history','neofetch','hello']
+      .forEach(c=>termPrint('out','  '+c));
+      break;
+    case 'ls':{
+      const items=(fs[termCwd]||[]);
+      termPrint('out',items.length?items.join('  '):'(empty)');
+      break;}
+    case 'pwd': termPrint('out',termCwd); break;
+    case 'cd':{
+      const target=a[0];
+      if(!target||target==='~'){termCwd='/home/user';break;}
+      if(target==='..'){const p=termCwd.split('/');p.pop();termCwd=p.join('/')||'/';break;}
+      const next=target.startsWith('/')?target:termCwd+'/'+target;
+      if(fs[next]!==undefined) termCwd=next;
+      else termPrint('err','cd: '+target+': No such directory');
+      break;}
+    case 'echo': termPrint('out',a.join(' ')); break;
+    case 'cat':{
+      const f=termCwd+'/'+a[0];
+      const fakeContent={
+        '/home/user/readme.txt':'Welcome to NexusOS!\nThis is a simulated OS environment.',
+        '/home/user/config.json':'{\n  "theme":"dark",\n  "user":"nexus",\n  "version":"1.0.0"\n}',
+        '/home/documents/notes.txt':'My notes:\n- Learn NexusOS\n- Explore the terminal',
+      };
+      termPrint('out',fakeContent[f]||('cat: '+a[0]+': No such file'));
+      break;}
+    case 'mkdir': if(a[0]){(fs[termCwd]||(fs[termCwd]=[])).push(a[0]);termPrint('out','Created: '+a[0]);}break;
+    case 'touch': if(a[0]){(fs[termCwd]||(fs[termCwd]=[])).push(a[0]);termPrint('out','Created: '+a[0]);}break;
+    case 'rm': if(a[0]){const arr=fs[termCwd]||[];const i=arr.indexOf(a[0]);if(i>-1){arr.splice(i,1);termPrint('out','Removed: '+a[0]);}else termPrint('err','rm: '+a[0]+': Not found');}break;
+    case 'clear': document.getElementById('term-out').innerHTML=''; break;
+    case 'date': termPrint('out',new Date().toString()); break;
+    case 'whoami': termPrint('out','nexus'); break;
+    case 'uname': termPrint('out','NexusOS 1.0.0 x86_64'); break;
+    case 'ps': termPrint('out','PID  COMMAND\n 1   init\n 2   desktop\n 3   terminal\n 4   nexusd'); break;
+    case 'top': termPrint('out','CPU: '+(Math.random()*20+5).toFixed(1)+'%  MEM: '+(Math.random()*30+20).toFixed(1)+'%'); break;
+    case 'history': termHistory.forEach((h,i)=>termPrint('out',(i+1)+'  '+h)); break;
+    case 'neofetch':
+      termPrint('sys','  _   _                    ');
+      termPrint('sys',' | \\ | | _____  ___   _ ___ ');
+      termPrint('sys',' |  \\| |/ _ \\ \\/ / | | / __|');
+      termPrint('sys',' | |\\  |  __/>  <| |_| \\__ \\');
+      termPrint('sys',' |_| \\_|\\___/_/\\_\\\\__,_|___/');
+      termPrint('out','OS: NexusOS 1.0.0');
+      termPrint('out','Shell: nexsh 1.0');
+      termPrint('out','CPU: Simulated x86_64');
+      termPrint('out','RAM: 4GB');
+      termPrint('out','Theme: Dark Cyan');
+      break;
+    case 'hello': termPrint('out','Hello, user! Welcome to NexusOS.'); break;
+    default: termPrint('err',cmd+': command not found. Type "help".');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// FILE MANAGER
+// ═══════════════════════════════════════════════
+let fmCwd='/home', fmHistory=['/home'];
+const fmFiles={
+  '/home':[
+    {name:'user',type:'folder',icon:'👤'},
+    {name:'documents',type:'folder',icon:'📄'},
+    {name:'downloads',type:'folder',icon:'⬇️'},
+    {name:'music',type:'folder',icon:'🎵'},
+    {name:'pictures',type:'folder',icon:'🖼️'},
+  ],
+  '/home/user':[
+    {name:'readme.txt',type:'file',icon:'📝'},
+    {name:'config.json',type:'file',icon:'⚙️'},
+    {name:'notes.txt',type:'file',icon:'📄'},
+  ],
+  '/home/documents':[
+    {name:'report.pdf',type:'file',icon:'📕'},
+    {name:'project.md',type:'file',icon:'📝'},
+    {name:'budget.xlsx',type:'file',icon:'📊'},
+  ],
+  '/home/downloads':[
+    {name:'archive.zip',type:'file',icon:'🗜️'},
+    {name:'photo.jpg',type:'file',icon:'🖼️'},
+    {name:'installer.exe',type:'file',icon:'💾'},
+  ],
+  '/music':[
+    {name:'neon_drift.mp3',type:'file',icon:'🎵'},
+    {name:'cyberpunk.wav',type:'file',icon:'🎵'},
+    {name:'playlist',type:'folder',icon:'📂'},
+  ],
+  '/pictures':[
+    {name:'wallpaper.jpg',type:'file',icon:'🖼️'},
+    {name:'screenshot.png',type:'file',icon:'🖼️'},
+  ],
+  '/system':[
+    {name:'bin',type:'folder',icon:'📂'},
+    {name:'etc',type:'folder',icon:'📂'},
+    {name:'lib',type:'folder',icon:'📂'},
+  ],
+  '/trash':[],
+};
+
+function fmInit(path){ fmNav(path); }
+function fmNav(path){
+  fmCwd=path;
+  document.getElementById('fm-path').textContent=path;
+  const grid=document.getElementById('fm-grid');
+  grid.innerHTML='';
+  const items=fmFiles[path]||[];
+  items.forEach(item=>{
+    const el=document.createElement('div');
+    el.className='fm-item';
+    el.innerHTML=`<div class="fm-item-icon">${item.icon}</div><div class="fm-item-name">${item.name}</div>`;
+    el.onclick=()=>el.classList.toggle('selected');
+    el.ondblclick=()=>{
+      if(item.type==='folder') fmNav(path+'/'+item.name);
+      else { openApp('editor'); setTimeout(()=>{
+        document.getElementById('ed-filename').value=item.name;
+        document.getElementById('ed-area').value='(Contents of '+item.name+')';
+        edUpdate();
+      },100);}
+    };
+    grid.appendChild(el);
+  });
+  document.getElementById('fm-status').textContent=
+    items.length+' items · '+((Math.random()*5+1).toFixed(1))+' GB free';
+  // update sidebar active
+  document.querySelectorAll('.fm-side-item').forEach(s=>s.classList.remove('active'));
+  const sideMap={'/home':'Home','/home/documents':'Documents','/home/downloads':'Downloads',
+    '/music':'Music','/pictures':'Pictures','/system':'System','/trash':'Trash'};
+  document.querySelectorAll('.fm-side-item').forEach(s=>{
+    if(s.textContent.includes(sideMap[path])) s.classList.add('active');
+  });
+}
+function fmBack(){ if(fmHistory.length>1){fmHistory.pop();fmNav(fmHistory[fmHistory.length-1]);} }
+function fmUp(){
+  const parts=fmCwd.split('/'); parts.pop();
+  fmNav(parts.join('/')||'/');
+}
+
+// ═══════════════════════════════════════════════
+// TEXT EDITOR
+// ═══════════════════════════════════════════════
+let edSaved=true;
+function edUpdate(){
+  const a=document.getElementById('ed-area');
+  const text=a.value;
+  const lines=text.split('\n').length;
+  const words=text.trim()?text.trim().split(/\s+/).length:0;
+  document.getElementById('ed-lines').textContent='Lines: '+lines;
+  document.getElementById('ed-chars').textContent='Chars: '+text.length;
+  document.getElementById('ed-words').textContent='Words: '+words;
+  document.getElementById('ed-saved').textContent='● UNSAVED';
+  document.getElementById('ed-saved').style.color='var(--orange)';
+}
+function edSave(){
+  document.getElementById('ed-saved').textContent='✓ SAVED';
+  document.getElementById('ed-saved').style.color='var(--green)';
+  notify('File saved: '+document.getElementById('ed-filename').value);
+}
+function edNew(){
+  document.getElementById('ed-area').value='';
+  document.getElementById('ed-filename').value='untitled.txt';
+  document.getElementById('ed-saved').textContent='● UNSAVED';
+  edUpdate();
+}
+function edOpen(){ notify('File open dialog (simulated)'); }
+
+// ═══════════════════════════════════════════════
+// CALCULATOR
+// ═══════════════════════════════════════════════
+let calcCur='0', calcPrev='', calcOp_='', calcNewNum=false;
+function calcDisplay(){
+  document.getElementById('calc-val').textContent=calcCur;
+  document.getElementById('calc-expr').textContent=calcPrev+(calcOp_?calcOp_:'');
+}
+function calcNum(n){
+  if(calcNewNum){ calcCur=n==='.'?'0.':n; calcNewNum=false; }
+  else if(n==='.'&&calcCur.includes('.')) return;
+  else calcCur=calcCur==='0'&&n!=='.'?n:calcCur+n;
+  calcDisplay();
+}
+function calcOp(op){
+  calcPrev=calcCur; calcOp_=op; calcNewNum=true; calcDisplay();
+}
+function calcEq(){
+  if(!calcPrev||!calcOp_) return;
+  const a=parseFloat(calcPrev), b=parseFloat(calcCur);
+  let res;
+  try{ res=eval(a+calcOp_+b); }catch(e){res='Err';}
+  calcCur=isFinite(res)?parseFloat(res.toFixed(10)).toString():'Error';
+  calcPrev=''; calcOp_=''; calcNewNum=true; calcDisplay();
+}
+function calcFn(f){
+  if(f==='clear'){ calcCur='0'; calcPrev=''; calcOp_=''; calcNewNum=false; }
+  else if(f==='sign') calcCur=String(-parseFloat(calcCur));
+  else if(f==='pct') calcCur=String(parseFloat(calcCur)/100);
+  calcDisplay();
+}
+
+// ═══════════════════════════════════════════════
+// BROWSER
+// ═══════════════════════════════════════════════
+const brPages={
+  'nexus://home': ()=>`
+    <div class="br-home">
+      <div class="br-home-logo">NEXUS</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:3px">BROWSER v1.0</div>
+      <div class="br-search-wrap">
+        <input class="br-search" id="br-search-input" placeholder="Search NexusWeb..." onkeydown="if(event.key==='Enter')brSearch()" />
+        <button class="br-search-btn" onclick="brSearch()">SEARCH</button>
+      </div>
+      <div class="br-bookmarks">
+        <div class="br-bk" onclick="brLoad('nexus://news')">📰 News</div>
+        <div class="br-bk" onclick="brLoad('nexus://docs')">📚 Docs</div>
+        <div class="br-bk" onclick="brLoad('nexus://about')">ℹ️ About</div>
+        <div class="br-bk" onclick="brLoad('nexus://store')">🛒 Store</div>
+      </div>
+    </div>`,
+  'nexus://news': ()=>`
+    <div class="br-page">
+      <h1>NEXUS NEWS</h1>
+      <h2>🚀 NexusOS 1.0 Released</h2>
+      <p>The latest version brings a full desktop environment, draggable windows, and a built-in terminal. Performance improvements across the board.</p>
+      <h2>💻 Dev Update</h2>
+      <p>The NexusOS team has announced new app integrations coming in v1.1 including a code editor upgrade and media viewer.</p>
+      <h2>🔒 Security Patch</h2>
+      <p>A critical update addressing kernel vulnerabilities has been deployed. All users are advised to update immediately.</p>
+    </div>`,
+  'nexus://docs': ()=>`
+    <div class="br-page">
+      <h1>NEXUS DOCS</h1>
+      <h2>Getting Started</h2>
+      <p>Double-click any desktop icon to open an app. Drag windows by their title bar. Use the taskbar to switch between apps.</p>
+      <h2>Terminal Commands</h2>
+      <p>Open the Terminal and type <code>help</code> to see all available commands including <code>ls</code>, <code>cd</code>, <code>cat</code>, and more.</p>
+      <h2>Keyboard Shortcuts</h2>
+      <p>Right-click the desktop for the context menu. Click window buttons to close, minimize, or maximize.</p>
+    </div>`,
+  'nexus://about': ()=>`
+    <div class="br-page">
+      <h1>ABOUT NEXUS OS</h1>
+      <h2>Version 1.0.0</h2>
+      <p>NexusOS is a simulated desktop operating system running entirely in your browser. Built with pure HTML, CSS, and JavaScript.</p>
+      <h2>Features</h2>
+      <p>Draggable windows · File Manager · Terminal · Text Editor · Calculator · Music Player · Browser · Settings</p>
+      <h2>Credits</h2>
+      <p>Built with ❤️ and lots of CSS. No frameworks harmed in the making of this OS.</p>
+    </div>`,
+  'nexus://store': ()=>`
+    <div class="br-page">
+      <h1>NEXUS STORE</h1>
+      <h2>Featured Apps</h2>
+      <p>🎮 <strong style="color:var(--cyan)">NexusGames</strong> — Retro gaming collection (Coming soon)</p>
+      <p>📊 <strong style="color:var(--cyan)">DataView</strong> — Spreadsheet & charts (Coming soon)</p>
+      <p>🎨 <strong style="color:var(--cyan)">PixelArt</strong> — Image editor (Coming soon)</p>
+      <p>📧 <strong style="color:var(--cyan)">NexusMail</strong> — Email client (Coming soon)</p>
+    </div>`,
+};
+let brHistoryList=['nexus://home'], brHI=0;
+
+function brHome(){ brLoad('nexus://home'); }
+function brLoad(url){
+  document.getElementById('br-url').value=url;
+  const content=document.getElementById('br-content');
+  if(brPages[url]) content.innerHTML=brPages[url]();
+  else content.innerHTML=`<div class="br-page"><h1>404</h1><p>Page not found: ${url}</p></div>`;
+  if(!brHistoryList[brHI]||brHistoryList[brHI]!==url){
+    brHistoryList=brHistoryList.slice(0,brHI+1);
+    brHistoryList.push(url); brHI=brHistoryList.length-1;
+  }
+}
+function brGo(){
+  const url=document.getElementById('br-url').value.trim();
+  if(url) brLoad(url.includes('://')?url:'nexus://'+url);
+}
+function brSearch(){
+  const q=document.getElementById('br-search-input')?.value.trim();
+  if(!q)return;
+  const content=document.getElementById('br-content');
+  content.innerHTML=`<div class="br-page"><h1>SEARCH: ${q}</h1>
+    <p>Showing results for "<strong style="color:var(--cyan)">${q}</strong>"</p>
+    <h2>nexus://results/1</h2><p>Best match for your query about ${q}. Click to visit.</p>
+    <h2>nexus://results/2</h2><p>Related information about ${q} found in NexusDocs.</p>
+    <h2>nexus://results/3</h2><p>Community discussion about ${q} on NexusForum.</p>
+  </div>`;
+}
+function brBack(){ if(brHI>0){brHI--;brLoad(brHistoryList[brHI]);} }
+function brFwd(){ if(brHI<brHistoryList.length-1){brHI++;brLoad(brHistoryList[brHI]);} }
+
+// ═══════════════════════════════════════════════
+// MUSIC
+// ═══════════════════════════════════════════════
+const songs=[
+  {title:'Neon Drift',artist:'Synthwave Collective',icon:'🌊',dur:'3:45',color:'#00d4ff'},
+  {title:'Cyber Rain',artist:'Digital Storm',icon:'⚡',dur:'4:12',color:'#9c6fff'},
+  {title:'Zero Point',artist:'Neural Bass',icon:'🔮',dur:'3:28',color:'#00ff88'},
+  {title:'Dark Matter',artist:'Quantum Beat',icon:'🌌',dur:'5:01',color:'#ff8c00'},
+  {title:'Circuit Break',artist:'Code Pulse',icon:'💻',dur:'3:55',color:'#ff3355'},
+];
+let musicIdx=0, musicPlaying=false, musicTimer=null, musicSec=0;
+
+function musicInit(){
+  renderPlaylist(); loadSong(0);
+}
+function renderPlaylist(){
+  const pl=document.getElementById('music-playlist');
+  pl.innerHTML=songs.map((s,i)=>`
+    <div class="pl-item${i===musicIdx?' active':''}" onclick="loadSong(${i});musicPlay()">
+      <span class="pl-num">${i+1}</span>
+      <span class="pl-name">${s.title}</span>
+      <span class="pl-dur">${s.dur}</span>
+    </div>`).join('');
+}
+function loadSong(i){
+  musicIdx=i; const s=songs[i];
+  document.getElementById('music-title').textContent=s.title;
+  document.getElementById('music-artist').textContent=s.artist.toUpperCase();
+  document.getElementById('music-art').textContent=s.icon;
+  document.getElementById('music-art').style.boxShadow=`0 8px 30px rgba(0,0,0,.5),0 0 30px ${s.color}40`;
+  document.getElementById('music-tot').textContent=s.dur;
+  musicSec=0; updateMusicProg();
+  renderPlaylist();
+}
+function musicPlay(){
+  musicPlaying=true;
+  document.getElementById('music-play-btn').textContent='⏸';
+  clearInterval(musicTimer);
+  const s=songs[musicIdx];
+  const [m,sc]=s.dur.split(':').map(Number);
+  const total=m*60+sc;
+  musicTimer=setInterval(()=>{
+    musicSec++;
+    if(musicSec>=total){musicSec=0;musicNext();}
+    updateMusicProg();
+  },1000);
+}
+function musicPause(){
+  musicPlaying=false;
+  document.getElementById('music-play-btn').textContent='▶';
+  clearInterval(musicTimer);
+}
+function musicToggle(){ musicPlaying?musicPause():musicPlay(); }
+function musicNext(){ loadSong((musicIdx+1)%songs.length); if(musicPlaying)musicPlay(); }
+function musicPrev(){ loadSong((musicIdx-1+songs.length)%songs.length); if(musicPlaying)musicPlay(); }
+function musicShuffle(){ loadSong(Math.floor(Math.random()*songs.length)); if(musicPlaying)musicPlay(); notify('Shuffle ON'); }
+function musicRepeat(){ notify('Repeat toggled'); }
+function updateMusicProg(){
+  const s=songs[musicIdx];
+  const [m,sc]=s.dur.split(':').map(Number);
+  const total=m*60+sc;
+  const pct=total>0?(musicSec/total*100):0;
+  document.getElementById('music-prog').style.width=pct+'%';
+  document.getElementById('music-cur').textContent=
+    Math.floor(musicSec/60)+':'+String(musicSec%60).padStart(2,'0');
+}
+
+// ═══════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════
+const settingsPanels={
+  display:`
+    <div class="set-section">
+      <h3>APPEARANCE</h3>
+      <div class="set-row">
+        <div><div class="set-row-label">Dark Mode</div><div class="set-row-desc">SYSTEM DEFAULT</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-row-label">Transparency Effects</div><div class="set-row-desc">BACKDROP BLUR</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-row-label">Animations</div><div class="set-row-desc">MOTION ENABLED</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="set-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+        <div class="set-row-label">Accent Color</div>
+        <div class="color-row">
+          <div class="color-chip active" style="background:#00d4ff" onclick="setAccent('#00d4ff',this)"></div>
+          <div class="color-chip" style="background:#9c6fff" onclick="setAccent('#9c6fff',this)"></div>
+          <div class="color-chip" style="background:#00ff88" onclick="setAccent('#00ff88',this)"></div>
+          <div class="color-chip" style="background:#ff8c00" onclick="setAccent('#ff8c00',this)"></div>
+          <div class="color-chip" style="background:#ff3355" onclick="setAccent('#ff3355',this)"></div>
+          <div class="color-chip" style="background:#ffd600" onclick="setAccent('#ffd600',this)"></div>
+        </div>
+      </div>
+      <div class="set-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+        <div class="set-row-label">Brightness</div>
+        <input type="range" class="set-slider" min="50" max="100" value="90" oninput="document.getElementById('desktop').style.filter='brightness('+this.value+'%)'" />
+      </div>
+    </div>`,
+  system:`
+    <div class="set-section">
+      <h3>SYSTEM</h3>
+      <div class="set-row">
+        <div><div class="set-row-label">Desktop Name</div><div class="set-row-desc">NEXUSOS-MACHINE</div></div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan)">NEXUSOS</div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-row-label">Auto-Updates</div><div class="set-row-desc">CHECK ON STARTUP</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-row-label">Show Clock</div><div class="set-row-desc">DESKTOP WIDGET</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on');document.getElementById('clock-widget').style.display=this.classList.contains('on')?'block':'none'"></div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-row-label">Scan Line Effect</div><div class="set-row-desc">VISUAL FX</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on');document.querySelector('.scanline').style.display=this.classList.contains('on')?'block':'none'"></div>
+      </div>
+    </div>`,
+  about:`
+    <div class="set-section">
+      <h3>ABOUT NEXUSOS</h3>
+      <div class="set-row"><div class="set-row-label">Version</div><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan)">1.0.0</div></div>
+      <div class="set-row"><div class="set-row-label">Build</div><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan)">NEXUSOS-2025</div></div>
+      <div class="set-row"><div class="set-row-label">Kernel</div><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan)">NexusKernel 1.0</div></div>
+      <div class="set-row"><div class="set-row-label">Architecture</div><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan)">HTML5 / CSS3 / JS</div></div>
+      <div class="set-row"><div class="set-row-label">Storage</div><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan)">Simulated VFS</div></div>
+    </div>`
+};
+
+function setPanel(p, el = null){
+  document.querySelectorAll('.set-item').forEach(i=>i.classList.remove('active'));
+  // If an element is passed, make it active. Otherwise, find the matching item.
+  if (el) {
+    el.classList.add('active');
+  } else {
+    // Fallback for initial programmatic load
+    const items = document.querySelectorAll('.set-item');
+    for(let item of items) {
+      if(item.textContent.toLowerCase().includes(p)) {
+        item.classList.add('active');
+        break;
+      }
+    }
+  }
+  document.getElementById('set-content').innerHTML=settingsPanels[p]||'';
+}
+
+function setAccent(color,el){
+  document.querySelectorAll('.color-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.documentElement.style.setProperty('--cyan',color);
+  notify('Accent color updated');
+}
+
+// ═══════════════════════════════════════════════
+// CONTEXT MENU
+// ═══════════════════════════════════════════════
+function showCtx(e){
+  e.preventDefault();
+  const m=document.getElementById('ctx-menu');
+  m.style.display='block';
+  m.style.left=Math.min(e.clientX,window.innerWidth-180)+'px';
+  m.style.top=Math.min(e.clientY,window.innerHeight-200)+'px';
+}
+document.addEventListener('click',()=>document.getElementById('ctx-menu').style.display='none');
+
+// ═══════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════
+function notify(msg){
+  const d=document.createElement('div');
+  d.className='notif'; d.textContent=msg;
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(),3200);
+}
+
+// ═══════════════════════════════════════════════
+// PWA INSTALL PROMPT
+// ═══════════════════════════════════════════════
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault(); deferredPrompt=e;
+  const btn=document.getElementById('install-btn');
+  if(btn) btn.style.display='flex';
+});
+window.addEventListener('appinstalled',()=>{
+  notify('✓ NexusOS installed to home screen!');
+  const btn=document.getElementById('install-btn');
+  if(btn) btn.style.display='none';
+});
+function installApp(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(r=>{
+      if(r.outcome==='accepted') notify('Installing NexusOS...');
+      deferredPrompt=null;
+    });
+  } else { showInstallGuide(); }
+}
+function showInstallGuide(){
+  const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  const isAndroid=/Android/.test(navigator.userAgent);
+  let msg='';
+  if(isAndroid) msg='Tap ⋮ menu in Chrome → "Add to Home screen" → tap Install';
+  else if(isIOS) msg='Tap the Share button → "Add to Home Screen" → tap Add';
+  else msg='In Chrome: tap Menu → "Install NexusOS" or "Add to Home screen"';
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML=`<div style="background:#0b1525;border:1px solid rgba(0,212,255,.4);border-radius:14px;padding:30px 24px;max-width:320px;text-align:center;font-family:sans-serif">
+    <div style="font-size:48px;margin-bottom:14px">📲</div>
+    <div style="font-family:'Orbitron',monospace;font-size:13px;letter-spacing:3px;color:#00d4ff;margin-bottom:16px">ADD TO HOME SCREEN</div>
+    <div style="font-size:13px;color:#6a9ab8;line-height:1.9;margin-bottom:18px">${msg}</div>
+    <button onclick="this.closest('div[style*=fixed]').remove()" style="padding:10px 26px;border-radius:6px;border:1px solid rgba(0,212,255,.4);background:rgba(0,212,255,.12);color:#00d4ff;cursor:pointer;font-size:12px;letter-spacing:1px">GOT IT ✓</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+// ═══════════════════════════════════════════════
+// TOUCH DRAG SUPPORT
+// ═══════════════════════════════════════════════
+document.addEventListener('touchstart',(e)=>{
+  const bar=e.target.closest('.win-bar');
+  if(!bar||e.target.classList.contains('wbtn')) return;
+  const el=bar.closest('.window');
+  const touch=e.touches[0];
+  const rect=el.getBoundingClientRect();
+  dragOX=touch.clientX-rect.left; dragOY=touch.clientY-rect.top;
+  dragging=el;
+  focusWindow(el.id.replace('app-',''));
+},{passive:true});
+document.addEventListener('touchmove',(e)=>{
+  if(!dragging) return;
+  e.preventDefault();
+  const t=e.touches[0];
+  let nx=t.clientX-dragOX, ny=t.clientY-dragOY;
+  nx=Math.max(0,Math.min(nx,window.innerWidth-80));
+  ny=Math.max(0,Math.min(ny,window.innerHeight-60));
+  dragging.style.left=nx+'px'; dragging.style.top=ny+'px';
+},{passive:false});
+document.addEventListener('touchend',()=>{ dragging=null; });
+// Prevent double-tap zoom
+let _lt=0;
+document.addEventListener('touchend',(e)=>{
+  const n=Date.now(); if(n-_lt<280) e.preventDefault(); _lt=n;
+},{passive:false});
+
+// ═══════════════════════════════════════════════
+// INLINE SERVICE WORKER FOR SINGLE-FILE PWA
+// ═══════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // We create a Blob containing the service worker code to keep this in 1 file
+    const swCode = `
+      const CACHE_NAME = 'nexus-os-v1';
+      self.addEventListener('install', (e) => {
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', (e) => {
+        e.waitUntil(clients.claim());
+      });
+      self.addEventListener('fetch', (e) => {
+        // Simple fetch strategy to satisfy PWA requirements
+        e.respondWith(fetch(e.request).catch(() => new Response('Offline Mode')));
+      });
+    `;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    
+    navigator.serviceWorker.register(swUrl)
+      .then((reg) => console.log('Inline ServiceWorker registered!'))
+      .catch((err) => console.log('ServiceWorker error: ', err));
+  });
+}
+</script>
+</body>
+</html>
